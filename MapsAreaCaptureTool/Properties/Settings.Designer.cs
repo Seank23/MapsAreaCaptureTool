@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace RenderDoc_Area_Capture.Properties
+namespace MapsAreaCaptureTool.Properties
 {
 
 

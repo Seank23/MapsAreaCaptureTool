@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace RenderDoc_Area_Capture
+namespace MapsAreaCaptureTool
 {
     static class Program
     {

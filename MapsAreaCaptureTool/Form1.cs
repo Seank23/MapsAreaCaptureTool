@@ -4,22 +4,20 @@ using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace RenderDoc_Area_Capture
+namespace MapsAreaCaptureTool
 {
     public partial class MapsAreaCaptureTool : Form
     {
         private static int METRES_IN_DEG = 111000;
+
         private int camAltitude = 250;
-        private List<string> captureCoords = new List<string>();
+        private List<Capture> capturesList = new List<Capture>();
         private GMapOverlay selectOverlay = new GMapOverlay();
         private GMapOverlay captureOverlay = new GMapOverlay();
         private PointLatLng selStartCoord;
@@ -46,7 +44,6 @@ namespace RenderDoc_Area_Capture
         {
             SaveFileDialog saveDialog = new SaveFileDialog();
             saveDialog.Filter = "Text file|*.txt";
-            saveDialog.ShowDialog();
 
             if (saveDialog.ShowDialog() == DialogResult.OK)
             {
@@ -58,9 +55,9 @@ namespace RenderDoc_Area_Capture
                         writer.WriteLine("AlignCaptures=" + chbAlignCaptures.Checked);
                         writer.Write("Captures=");
 
-                        foreach (string capture in captureCoords)
+                        foreach (Capture capture in capturesList)
                         {
-                            writer.Write(capture + ";");
+                            writer.Write(capture.Coordinate[0] + "," + capture.Coordinate[1] + "," + capture.Altitude + ";");
                         }
                     }
                 }
@@ -81,6 +78,12 @@ namespace RenderDoc_Area_Capture
                         while (!reader.EndOfStream)
                         {
                             string[] data = reader.ReadLine().Split('=');
+                            if(data.Length <= 1)
+                            {
+                                MessageBox.Show("Error: Format is incorrect, file could not be read.");
+                                return;
+                            }
+
                             switch (data[0])
                             {
                                 case "CamAlt":
@@ -94,7 +97,10 @@ namespace RenderDoc_Area_Capture
                                     foreach (string capture in captures)
                                     {
                                         if (capture != "")
-                                            captureCoords.Add(capture);
+                                        {
+                                            string[] captureData = capture.Split(',');
+                                            capturesList.Add(new Capture(new double[] { double.Parse(captureData[0]), double.Parse(captureData[1]) }, int.Parse(captureData[2])));
+                                        }
                                     }
                                     break;
                             }
@@ -133,7 +139,7 @@ namespace RenderDoc_Area_Capture
             }
 
             rtbResult.Text = "File opened successfully!\n\n";
-            DisplayCaptures(captureCoords);
+            DisplayCaptures(capturesList);
         }
 
         private void tbQuality_Scroll(object sender, EventArgs e)
@@ -192,7 +198,7 @@ namespace RenderDoc_Area_Capture
         private double[] GetCaptureDimensions(int camAlt)
         {
             double length = (2 * Math.PI * 6378137) / (256 * Math.Pow(2, GetZoomLevel(camAlt))) * 1000;
-            return new double[] { Math.Round(length, 2), Math.Round(length / GetAspectRatio() - (length / GetAspectRatio()) / 5, 2) };
+            return new double[] { Math.Round(length, 2), Math.Round(length / GetAspectRatio() - (length / GetAspectRatio()) / 10, 2) };
         }
 
         private double GetAspectRatio()
@@ -231,8 +237,8 @@ namespace RenderDoc_Area_Capture
 
         private double[] AlignCoords(double lat, double lng, double[] captureSize)
         {
-            double deltaLat = Math.Abs(double.Parse(captureCoords[0].Split(',')[0]) + DistanceToLat(captureSize[1] / 2) - lat);
-            double deltaLng = Math.Abs(double.Parse(captureCoords[0].Split(',')[1]) - DistanceToLng(double.Parse(captureCoords[0].Split(',')[0]), captureSize[0] / 2) - lng);
+            double deltaLat = Math.Abs(capturesList[0].Coordinate[0] + DistanceToLat(captureSize[1] / 2) - lat);
+            double deltaLng = Math.Abs(capturesList[0].Coordinate[1] - DistanceToLng(capturesList[0].Coordinate[0], captureSize[0] / 2) - lng);
             string a = lat + "," + lng;
             string b = (lat + deltaLat).ToString() + "," + (lng + deltaLng).ToString();
             double[] distance = GetDimensionsFromCoords(a, b);
@@ -247,9 +253,9 @@ namespace RenderDoc_Area_Capture
             return new double[] { lat + alignedLat, lng - alignedLng };
         }
 
-        private List<string> GetCaptureCoords()
+        private List<Capture> GetCaptures()
         {
-            List<string> myCaptures = new List<string>();
+            List<Capture> myCaptures = new List<Capture>();
             double[] captureSize = GetCaptureDimensions(camAltitude);
             double[] selDimensions = GetDimensionsFromCoords(txtSelCoordUpper.Text, txtSelCoordLower.Text);
 
@@ -260,7 +266,7 @@ namespace RenderDoc_Area_Capture
             double startLat = double.Parse(txtSelCoordUpper.Text.Split(',')[0]) - offset[1];
             double startLng = double.Parse(txtSelCoordUpper.Text.Split(',')[1]) + offset[0];
 
-            if (chbAlignCaptures.Checked && captureCoords.Count > 0)
+            if (chbAlignCaptures.Checked && capturesList.Count > 0)
             {
                 double[] alignedCoords = AlignCoords(startLat, startLng, captureSize);
                 startLat = alignedCoords[0];
@@ -278,7 +284,7 @@ namespace RenderDoc_Area_Capture
                     double captureLowerLng = curLng + DistanceToLng(captureLowerLat, captureSize[0]);
                     double captureMidLat = (curLat + captureLowerLat) / 2;
                     double captureMidLng = (curLng + captureLowerLng) / 2;
-                    myCaptures.Add(Math.Round(captureMidLat, 6) + "," + Math.Round(captureMidLng, 6));
+                    myCaptures.Add(new Capture(new double[] { Math.Round(captureMidLat, 6), Math.Round(captureMidLng, 6) }, camAltitude));
                     curLng = captureLowerLng;
                 }
                 curLat -= DistanceToLat(captureSize[1]);
@@ -287,20 +293,21 @@ namespace RenderDoc_Area_Capture
             return myCaptures;
         }
 
-        private void DisplayCaptures(List<string> captures)
+        private void DisplayCaptures(List<Capture> captures)
         {
             rtbResult.Text += "Area requires " + captures.Count + " captures\n\n";
-            double[] captureSize = GetCaptureDimensions(camAltitude);
 
-            foreach (string capture in captures)
+            foreach (Capture capture in captures)
             {
-                GMapMarker captureMarker = new GMarkerGoogle(new PointLatLng(double.Parse(capture.Split(',')[0]), double.Parse(capture.Split(',')[1])), GMarkerGoogleType.blue_small);
+                GMapMarker captureMarker = new GMarkerGoogle(new PointLatLng(capture.Coordinate[0], capture.Coordinate[1]), GMarkerGoogleType.blue);
+                captureMarker.ToolTipText = capture.URL;
                 captureOverlay.Markers.Add(captureMarker);
 
-                double topLat = double.Parse(capture.Split(',')[0]) + DistanceToLat(captureSize[1] / 2);
-                double topLng = double.Parse(capture.Split(',')[1]) - DistanceToLng(topLat, captureSize[0] / 2);
-                double bottomLat = double.Parse(capture.Split(',')[0]) - DistanceToLat(captureSize[1] / 2);
-                double bottomLng = double.Parse(capture.Split(',')[1]) + DistanceToLng(bottomLat, captureSize[0] / 2);
+                double[] captureSize = GetCaptureDimensions(capture.Altitude);
+                double topLat = capture.Coordinate[0] + DistanceToLat(captureSize[1] / 2);
+                double topLng = capture.Coordinate[1] - DistanceToLng(topLat, captureSize[0] / 2);
+                double bottomLat = capture.Coordinate[0] - DistanceToLat(captureSize[1] / 2);
+                double bottomLng = capture.Coordinate[1] + DistanceToLng(bottomLat, captureSize[0] / 2);
 
                 GMapPolygon capturePoly = new GMapPolygon(new List<PointLatLng>() { new PointLatLng(topLat, topLng), new PointLatLng(topLat, bottomLng),
                         new PointLatLng(bottomLat, bottomLng), new PointLatLng(bottomLat, topLng) }, "");
@@ -308,14 +315,14 @@ namespace RenderDoc_Area_Capture
                 capturePoly.Fill = new SolidBrush(Color.Empty);
                 captureOverlay.Polygons.Add(capturePoly);
 
-                rtbResult.Text += "https://www.google.com/maps/@" + capture + "," + camAltitude + "m/data=!3m1!1e3\n";
+                rtbResult.Text += capture.URL + "\n";
             }
         }
 
         private void btnCalculate_Click(object sender, EventArgs e)
         {
-            var returnedCoords = GetCaptureCoords();
-            captureCoords.AddRange(returnedCoords);
+            var returnedCoords = GetCaptures();
+            capturesList.AddRange(returnedCoords);
             DisplayCaptures(returnedCoords);
         }
 
@@ -342,6 +349,38 @@ namespace RenderDoc_Area_Capture
                 selPoly.Fill = new SolidBrush(Color.Empty);
                 selectOverlay.Polygons.Add(selPoly);
             }
+        }
+
+        private void clearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            capturesList.Clear();
+            captureOverlay.Clear();
+            rtbResult.Clear();
+        }
+
+        private void gMapControl_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if(e.Button == MouseButtons.Left)
+            {
+                for(int i = 0; i < captureOverlay.Polygons.Count; i++)
+                {
+                    PointLatLng clickPoint = gMapControl.FromLocalToLatLng(e.X, e.Y);
+                    if(captureOverlay.Polygons[i].IsInside(clickPoint))
+                    {
+                        string url = captureOverlay.Markers[i].ToolTipText;
+                        captureOverlay.Markers[i].ToolTipText = "Copied!";
+                        Clipboard.SetText(capturesList[i].URL);
+                        Task.Factory.StartNew(() => ResetToolTip(url, i));
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void ResetToolTip(string url, int index)
+        {
+            Thread.Sleep(1000);
+            captureOverlay.Markers[index].ToolTipText = url;
         }
     }
 }

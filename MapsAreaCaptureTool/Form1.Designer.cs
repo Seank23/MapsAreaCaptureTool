@@ -1,4 +1,4 @@
-﻿namespace RenderDoc_Area_Capture
+﻿namespace MapsAreaCaptureTool
 {
     partial class MapsAreaCaptureTool
     {
@@ -46,6 +46,8 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.captureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gMapControl = new GMap.NET.WindowsForms.GMapControl();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbQuality)).BeginInit();
@@ -69,9 +71,9 @@
             this.panel1.Controls.Add(this.LblQuality);
             this.panel1.Controls.Add(this.tbQuality);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel1.Location = new System.Drawing.Point(961, 30);
+            this.panel1.Location = new System.Drawing.Point(961, 28);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(306, 753);
+            this.panel1.Size = new System.Drawing.Size(306, 755);
             this.panel1.TabIndex = 0;
             // 
             // label4
@@ -103,7 +105,7 @@
             this.rtbResult.Location = new System.Drawing.Point(0, 323);
             this.rtbResult.Name = "rtbResult";
             this.rtbResult.ReadOnly = true;
-            this.rtbResult.Size = new System.Drawing.Size(303, 432);
+            this.rtbResult.Size = new System.Drawing.Size(303, 434);
             this.rtbResult.TabIndex = 11;
             this.rtbResult.Text = "";
             // 
@@ -207,10 +209,11 @@
             // 
             this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.captureToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1267, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(1267, 28);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -220,7 +223,7 @@
             this.saveAsToolStripMenuItem,
             this.openToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 26);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // saveAsToolStripMenuItem
@@ -237,6 +240,21 @@
             this.openToolStripMenuItem.Text = "Open...";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
+            // captureToolStripMenuItem
+            // 
+            this.captureToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.clearToolStripMenuItem});
+            this.captureToolStripMenuItem.Name = "captureToolStripMenuItem";
+            this.captureToolStripMenuItem.Size = new System.Drawing.Size(75, 24);
+            this.captureToolStripMenuItem.Text = "Capture";
+            // 
+            // clearToolStripMenuItem
+            // 
+            this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.clearToolStripMenuItem.Text = "Clear";
+            this.clearToolStripMenuItem.Click += new System.EventHandler(this.clearToolStripMenuItem_Click);
+            // 
             // gMapControl
             // 
             this.gMapControl.Bearing = 0F;
@@ -246,7 +264,7 @@
             this.gMapControl.GrayScaleMode = false;
             this.gMapControl.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
             this.gMapControl.LevelsKeepInMemory = 5;
-            this.gMapControl.Location = new System.Drawing.Point(0, 30);
+            this.gMapControl.Location = new System.Drawing.Point(0, 28);
             this.gMapControl.MarkersEnabled = true;
             this.gMapControl.MaxZoom = 2;
             this.gMapControl.MinZoom = 2;
@@ -260,9 +278,10 @@
             this.gMapControl.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl.ShowTileGridLines = false;
-            this.gMapControl.Size = new System.Drawing.Size(961, 753);
+            this.gMapControl.Size = new System.Drawing.Size(961, 755);
             this.gMapControl.TabIndex = 2;
             this.gMapControl.Zoom = 0D;
+            this.gMapControl.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.gMapControl_MouseDoubleClick);
             this.gMapControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_MouseDown);
             this.gMapControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gMapControl_MouseUp);
             // 
@@ -309,6 +328,8 @@
         private System.Windows.Forms.CheckBox chbAlignCaptures;
         private System.Windows.Forms.Label label4;
         private GMap.NET.WindowsForms.GMapControl gMapControl;
+        private System.Windows.Forms.ToolStripMenuItem captureToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
     }
 }
 
