@@ -244,7 +244,7 @@ namespace RenderDoc_Area_Capture
                 alignedLng -= captureSize[0];
             alignedLat = DistanceToLat(alignedLat);
             alignedLng = DistanceToLng(lat, alignedLng);
-            return new double[] { lat - alignedLat, lng - alignedLng };
+            return new double[] { lat + alignedLat, lng - alignedLng };
         }
 
         private List<string> GetCaptureCoords()
