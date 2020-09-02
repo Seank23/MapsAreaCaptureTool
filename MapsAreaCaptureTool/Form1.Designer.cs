@@ -1,6 +1,6 @@
 ﻿namespace RenderDoc_Area_Capture
 {
-    partial class RenderDocAreaCapture
+    partial class MapsAreaCaptureTool
     {
         /// <summary>
         /// Required designer variable.
@@ -28,8 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RenderDocAreaCapture));
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label4 = new System.Windows.Forms.Label();
+            this.chbAlignCaptures = new System.Windows.Forms.CheckBox();
             this.rtbResult = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.txtSelCoordLower = new System.Windows.Forms.TextBox();
@@ -45,13 +46,10 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.axMap1 = new AxMapWinGIS.AxMap();
-            this.chbAlignCaptures = new System.Windows.Forms.CheckBox();
-            this.label4 = new System.Windows.Forms.Label();
+            this.gMapControl = new GMap.NET.WindowsForms.GMapControl();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbQuality)).BeginInit();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.axMap1)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -71,14 +69,37 @@
             this.panel1.Controls.Add(this.LblQuality);
             this.panel1.Controls.Add(this.tbQuality);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel1.Location = new System.Drawing.Point(964, 28);
+            this.panel1.Location = new System.Drawing.Point(961, 30);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(303, 755);
+            this.panel1.Size = new System.Drawing.Size(306, 753);
             this.panel1.TabIndex = 0;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label4.Location = new System.Drawing.Point(23, 91);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(72, 17);
+            this.label4.TabIndex = 13;
+            this.label4.Text = "Settings:";
+            // 
+            // chbAlignCaptures
+            // 
+            this.chbAlignCaptures.AutoSize = true;
+            this.chbAlignCaptures.Checked = true;
+            this.chbAlignCaptures.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chbAlignCaptures.Location = new System.Drawing.Point(28, 196);
+            this.chbAlignCaptures.Name = "chbAlignCaptures";
+            this.chbAlignCaptures.Size = new System.Drawing.Size(122, 21);
+            this.chbAlignCaptures.TabIndex = 12;
+            this.chbAlignCaptures.Text = "Align Captures";
+            this.chbAlignCaptures.UseVisualStyleBackColor = true;
             // 
             // rtbResult
             // 
-            this.rtbResult.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.rtbResult.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.rtbResult.Location = new System.Drawing.Point(0, 323);
             this.rtbResult.Name = "rtbResult";
             this.rtbResult.ReadOnly = true;
@@ -189,7 +210,7 @@
             this.fileToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1267, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(1267, 30);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -199,7 +220,7 @@
             this.saveAsToolStripMenuItem,
             this.openToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 26);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // saveAsToolStripMenuItem
@@ -216,53 +237,52 @@
             this.openToolStripMenuItem.Text = "Open...";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
-            // axMap1
+            // gMapControl
             // 
-            this.axMap1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.axMap1.Enabled = true;
-            this.axMap1.Location = new System.Drawing.Point(0, 28);
-            this.axMap1.Name = "axMap1";
-            this.axMap1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axMap1.OcxState")));
-            this.axMap1.Size = new System.Drawing.Size(964, 755);
-            this.axMap1.TabIndex = 2;
+            this.gMapControl.Bearing = 0F;
+            this.gMapControl.CanDragMap = true;
+            this.gMapControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gMapControl.EmptyTileColor = System.Drawing.Color.Navy;
+            this.gMapControl.GrayScaleMode = false;
+            this.gMapControl.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            this.gMapControl.LevelsKeepInMemory = 5;
+            this.gMapControl.Location = new System.Drawing.Point(0, 30);
+            this.gMapControl.MarkersEnabled = true;
+            this.gMapControl.MaxZoom = 2;
+            this.gMapControl.MinZoom = 2;
+            this.gMapControl.MouseWheelZoomEnabled = true;
+            this.gMapControl.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            this.gMapControl.Name = "gMapControl";
+            this.gMapControl.NegativeMode = false;
+            this.gMapControl.PolygonsEnabled = true;
+            this.gMapControl.RetryLoadTile = 0;
+            this.gMapControl.RoutesEnabled = true;
+            this.gMapControl.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            this.gMapControl.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            this.gMapControl.ShowTileGridLines = false;
+            this.gMapControl.Size = new System.Drawing.Size(961, 753);
+            this.gMapControl.TabIndex = 2;
+            this.gMapControl.Zoom = 0D;
+            this.gMapControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_MouseDown);
+            this.gMapControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gMapControl_MouseUp);
             // 
-            // chbAlignCaptures
-            // 
-            this.chbAlignCaptures.AutoSize = true;
-            this.chbAlignCaptures.Location = new System.Drawing.Point(28, 196);
-            this.chbAlignCaptures.Name = "chbAlignCaptures";
-            this.chbAlignCaptures.Size = new System.Drawing.Size(122, 21);
-            this.chbAlignCaptures.TabIndex = 12;
-            this.chbAlignCaptures.Text = "Align Captures";
-            this.chbAlignCaptures.UseVisualStyleBackColor = true;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(23, 91);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(72, 17);
-            this.label4.TabIndex = 13;
-            this.label4.Text = "Settings:";
-            // 
-            // RenderDocAreaCapture
+            // MapsAreaCaptureTool
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1267, 783);
-            this.Controls.Add(this.axMap1);
+            this.Controls.Add(this.gMapControl);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Name = "RenderDocAreaCapture";
+            this.Name = "MapsAreaCaptureTool";
             this.Text = "MapsAreaCaptureTool";
+            this.Load += new System.EventHandler(this.MapsAreaCaptureTool_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.tbQuality)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.axMap1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -278,7 +298,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox chbCustomQuality;
         private System.Windows.Forms.TextBox txtCamAlt;
-        private AxMapWinGIS.AxMap axMap1;
         private System.Windows.Forms.Button btnCalculate;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtSelCoordLower;
@@ -289,6 +308,7 @@
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.CheckBox chbAlignCaptures;
         private System.Windows.Forms.Label label4;
+        private GMap.NET.WindowsForms.GMapControl gMapControl;
     }
 }
 

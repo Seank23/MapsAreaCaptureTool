@@ -16,7 +16,7 @@ namespace RenderDoc_Area_Capture
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new RenderDocAreaCapture());
+            Application.Run(new MapsAreaCaptureTool());
         }
     }
 }
