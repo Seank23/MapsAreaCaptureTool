@@ -57,7 +57,7 @@ namespace MapsAreaCaptureTool
 
                         foreach (Capture capture in capturesList)
                         {
-                            writer.Write(capture.Coordinate[0] + "," + capture.Coordinate[1] + "," + capture.Altitude + ";");
+                            writer.Write(capture.Coordinate[0] + "," + capture.Coordinate[1] + "," + capture.Altitude + "," + capture.Overlap + ";");
                         }
                     }
                 }
@@ -99,7 +99,7 @@ namespace MapsAreaCaptureTool
                                         if (capture != "")
                                         {
                                             string[] captureData = capture.Split(',');
-                                            capturesList.Add(new Capture(new double[] { double.Parse(captureData[0]), double.Parse(captureData[1]) }, int.Parse(captureData[2])));
+                                            capturesList.Add(new Capture(new double[] { double.Parse(captureData[0]), double.Parse(captureData[1]) }, int.Parse(captureData[2]), int.Parse(captureData[3])));
                                         }
                                     }
                                     break;
@@ -198,7 +198,9 @@ namespace MapsAreaCaptureTool
         private double[] GetCaptureDimensions(int camAlt)
         {
             double length = (2 * Math.PI * 6378137) / (256 * Math.Pow(2, GetZoomLevel(camAlt))) * 1000;
-            return new double[] { Math.Round(length, 2), Math.Round(length / GetAspectRatio() - (length / GetAspectRatio()) / 10, 2) };
+            double overlapX = length * (Convert.ToDouble(numOverlap.Value) / 100);
+            double overlapY = length / GetAspectRatio() * (Convert.ToDouble(numOverlap.Value) / 100);
+            return new double[] { Math.Round(length - overlapX, 2), Math.Round(length / GetAspectRatio() - overlapY, 2) };
         }
 
         private double GetAspectRatio()
@@ -261,10 +263,15 @@ namespace MapsAreaCaptureTool
 
             int numHorizontal = (int)Math.Ceiling(selDimensions[0] / captureSize[0]);
             int numVertical = (int)Math.Ceiling(selDimensions[1] / captureSize[1]);
-            double[] offset = CalculateOffset(numHorizontal - (selDimensions[0] / captureSize[0]), numVertical - (selDimensions[1] / captureSize[1]), captureSize, double.Parse(txtSelCoordUpper.Text.Split(',')[0]));
-
-            double startLat = double.Parse(txtSelCoordUpper.Text.Split(',')[0]) - offset[1];
-            double startLng = double.Parse(txtSelCoordUpper.Text.Split(',')[1]) + offset[0];
+            double startLat = double.Parse(txtSelCoordUpper.Text.Split(',')[0]);
+            double startLng = double.Parse(txtSelCoordUpper.Text.Split(',')[1]);
+            
+            if(chbCentre.Checked)
+            {
+                double[] offset = CalculateOffset(numHorizontal - (selDimensions[0] / captureSize[0]), numVertical - (selDimensions[1] / captureSize[1]), captureSize, double.Parse(txtSelCoordUpper.Text.Split(',')[0]));
+                startLat -= offset[1];
+                startLng += offset[0];
+            }
 
             if (chbAlignCaptures.Checked && capturesList.Count > 0)
             {
@@ -284,7 +291,7 @@ namespace MapsAreaCaptureTool
                     double captureLowerLng = curLng + DistanceToLng(captureLowerLat, captureSize[0]);
                     double captureMidLat = (curLat + captureLowerLat) / 2;
                     double captureMidLng = (curLng + captureLowerLng) / 2;
-                    myCaptures.Add(new Capture(new double[] { Math.Round(captureMidLat, 6), Math.Round(captureMidLng, 6) }, camAltitude));
+                    myCaptures.Add(new Capture(new double[] { Math.Round(captureMidLat, 6), Math.Round(captureMidLng, 6) }, camAltitude, Convert.ToInt32(numOverlap.Value)));
                     curLng = captureLowerLng;
                 }
                 curLat -= DistanceToLat(captureSize[1]);
@@ -300,7 +307,7 @@ namespace MapsAreaCaptureTool
             foreach (Capture capture in captures)
             {
                 GMapMarker captureMarker = new GMarkerGoogle(new PointLatLng(capture.Coordinate[0], capture.Coordinate[1]), GMarkerGoogleType.blue);
-                captureMarker.ToolTipText = capture.URL;
+                captureMarker.ToolTipText = capture.URL + "\nDouble-click to copy to clipboard";
                 captureOverlay.Markers.Add(captureMarker);
 
                 double[] captureSize = GetCaptureDimensions(capture.Altitude);
@@ -321,9 +328,16 @@ namespace MapsAreaCaptureTool
 
         private void btnCalculate_Click(object sender, EventArgs e)
         {
-            var returnedCoords = GetCaptures();
-            capturesList.AddRange(returnedCoords);
-            DisplayCaptures(returnedCoords);
+            try
+            {
+                var returnedCoords = GetCaptures();
+                capturesList.AddRange(returnedCoords);
+                DisplayCaptures(returnedCoords);
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Invalid selection, please try again...");
+            }
         }
 
         private void gMapControl_MouseDown(object sender, MouseEventArgs e)

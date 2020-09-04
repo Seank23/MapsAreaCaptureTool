@@ -29,6 +29,9 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label6 = new System.Windows.Forms.Label();
+            this.numOverlap = new System.Windows.Forms.NumericUpDown();
+            this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.chbAlignCaptures = new System.Windows.Forms.CheckBox();
             this.rtbResult = new System.Windows.Forms.RichTextBox();
@@ -49,7 +52,9 @@
             this.captureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gMapControl = new GMap.NET.WindowsForms.GMapControl();
+            this.chbCentre = new System.Windows.Forms.CheckBox();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numOverlap)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbQuality)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -57,6 +62,10 @@
             // panel1
             // 
             this.panel1.AutoSize = true;
+            this.panel1.Controls.Add(this.chbCentre);
+            this.panel1.Controls.Add(this.label6);
+            this.panel1.Controls.Add(this.numOverlap);
+            this.panel1.Controls.Add(this.label5);
             this.panel1.Controls.Add(this.label4);
             this.panel1.Controls.Add(this.chbAlignCaptures);
             this.panel1.Controls.Add(this.rtbResult);
@@ -71,10 +80,41 @@
             this.panel1.Controls.Add(this.LblQuality);
             this.panel1.Controls.Add(this.tbQuality);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel1.Location = new System.Drawing.Point(961, 28);
+            this.panel1.Location = new System.Drawing.Point(941, 30);
+            this.panel1.Margin = new System.Windows.Forms.Padding(0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(306, 755);
+            this.panel1.Size = new System.Drawing.Size(326, 753);
             this.panel1.TabIndex = 0;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(212, 183);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(20, 17);
+            this.label6.TabIndex = 16;
+            this.label6.Text = "%";
+            // 
+            // numOverlap
+            // 
+            this.numOverlap.Location = new System.Drawing.Point(96, 181);
+            this.numOverlap.Name = "numOverlap";
+            this.numOverlap.Size = new System.Drawing.Size(107, 22);
+            this.numOverlap.TabIndex = 15;
+            this.numOverlap.Value = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(19, 183);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(62, 17);
+            this.label5.TabIndex = 14;
+            this.label5.Text = "Overlap:";
             // 
             // label4
             // 
@@ -91,7 +131,7 @@
             this.chbAlignCaptures.AutoSize = true;
             this.chbAlignCaptures.Checked = true;
             this.chbAlignCaptures.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chbAlignCaptures.Location = new System.Drawing.Point(28, 196);
+            this.chbAlignCaptures.Location = new System.Drawing.Point(15, 222);
             this.chbAlignCaptures.Name = "chbAlignCaptures";
             this.chbAlignCaptures.Size = new System.Drawing.Size(122, 21);
             this.chbAlignCaptures.TabIndex = 12;
@@ -102,10 +142,11 @@
             // 
             this.rtbResult.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.rtbResult.Location = new System.Drawing.Point(0, 323);
+            this.rtbResult.Location = new System.Drawing.Point(3, 325);
+            this.rtbResult.Margin = new System.Windows.Forms.Padding(0);
             this.rtbResult.Name = "rtbResult";
             this.rtbResult.ReadOnly = true;
-            this.rtbResult.Size = new System.Drawing.Size(303, 434);
+            this.rtbResult.Size = new System.Drawing.Size(320, 428);
             this.rtbResult.TabIndex = 11;
             this.rtbResult.Text = "";
             // 
@@ -147,7 +188,7 @@
             // 
             // btnCalculate
             // 
-            this.btnCalculate.Location = new System.Drawing.Point(87, 255);
+            this.btnCalculate.Location = new System.Drawing.Point(96, 264);
             this.btnCalculate.Name = "btnCalculate";
             this.btnCalculate.Size = new System.Drawing.Size(132, 34);
             this.btnCalculate.TabIndex = 5;
@@ -157,7 +198,7 @@
             // 
             // txtCamAlt
             // 
-            this.txtCamAlt.Location = new System.Drawing.Point(87, 127);
+            this.txtCamAlt.Location = new System.Drawing.Point(96, 127);
             this.txtCamAlt.Name = "txtCamAlt";
             this.txtCamAlt.Size = new System.Drawing.Size(107, 22);
             this.txtCamAlt.TabIndex = 4;
@@ -167,7 +208,7 @@
             // chbCustomQuality
             // 
             this.chbCustomQuality.AutoSize = true;
-            this.chbCustomQuality.Location = new System.Drawing.Point(206, 130);
+            this.chbCustomQuality.Location = new System.Drawing.Point(215, 130);
             this.chbCustomQuality.Name = "chbCustomQuality";
             this.chbCustomQuality.Size = new System.Drawing.Size(77, 21);
             this.chbCustomQuality.TabIndex = 3;
@@ -187,7 +228,7 @@
             // LblQuality
             // 
             this.LblQuality.AutoSize = true;
-            this.LblQuality.Location = new System.Drawing.Point(73, 158);
+            this.LblQuality.Location = new System.Drawing.Point(82, 158);
             this.LblQuality.MinimumSize = new System.Drawing.Size(146, 17);
             this.LblQuality.Name = "LblQuality";
             this.LblQuality.Size = new System.Drawing.Size(146, 17);
@@ -197,7 +238,7 @@
             // 
             // tbQuality
             // 
-            this.tbQuality.Location = new System.Drawing.Point(87, 119);
+            this.tbQuality.Location = new System.Drawing.Point(96, 119);
             this.tbQuality.Maximum = 3;
             this.tbQuality.Name = "tbQuality";
             this.tbQuality.Size = new System.Drawing.Size(111, 56);
@@ -213,7 +254,7 @@
             this.captureToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(1267, 28);
+            this.menuStrip1.Size = new System.Drawing.Size(1267, 30);
             this.menuStrip1.TabIndex = 1;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -223,7 +264,7 @@
             this.saveAsToolStripMenuItem,
             this.openToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 26);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // saveAsToolStripMenuItem
@@ -245,13 +286,13 @@
             this.captureToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.clearToolStripMenuItem});
             this.captureToolStripMenuItem.Name = "captureToolStripMenuItem";
-            this.captureToolStripMenuItem.Size = new System.Drawing.Size(75, 24);
+            this.captureToolStripMenuItem.Size = new System.Drawing.Size(75, 26);
             this.captureToolStripMenuItem.Text = "Capture";
             // 
             // clearToolStripMenuItem
             // 
             this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
-            this.clearToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(126, 26);
             this.clearToolStripMenuItem.Text = "Clear";
             this.clearToolStripMenuItem.Click += new System.EventHandler(this.clearToolStripMenuItem_Click);
             // 
@@ -264,7 +305,7 @@
             this.gMapControl.GrayScaleMode = false;
             this.gMapControl.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
             this.gMapControl.LevelsKeepInMemory = 5;
-            this.gMapControl.Location = new System.Drawing.Point(0, 28);
+            this.gMapControl.Location = new System.Drawing.Point(0, 30);
             this.gMapControl.MarkersEnabled = true;
             this.gMapControl.MaxZoom = 2;
             this.gMapControl.MinZoom = 2;
@@ -278,12 +319,24 @@
             this.gMapControl.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.gMapControl.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.gMapControl.ShowTileGridLines = false;
-            this.gMapControl.Size = new System.Drawing.Size(961, 755);
+            this.gMapControl.Size = new System.Drawing.Size(941, 753);
             this.gMapControl.TabIndex = 2;
             this.gMapControl.Zoom = 0D;
             this.gMapControl.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.gMapControl_MouseDoubleClick);
             this.gMapControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_MouseDown);
             this.gMapControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gMapControl_MouseUp);
+            // 
+            // chbCentre
+            // 
+            this.chbCentre.AutoSize = true;
+            this.chbCentre.Checked = true;
+            this.chbCentre.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chbCentre.Location = new System.Drawing.Point(148, 222);
+            this.chbCentre.Name = "chbCentre";
+            this.chbCentre.Size = new System.Drawing.Size(150, 21);
+            this.chbCentre.TabIndex = 17;
+            this.chbCentre.Text = "Centre to Selection";
+            this.chbCentre.UseVisualStyleBackColor = true;
             // 
             // MapsAreaCaptureTool
             // 
@@ -299,6 +352,7 @@
             this.Load += new System.EventHandler(this.MapsAreaCaptureTool_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numOverlap)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbQuality)).EndInit();
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -330,6 +384,10 @@
         private GMap.NET.WindowsForms.GMapControl gMapControl;
         private System.Windows.Forms.ToolStripMenuItem captureToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
+        private System.Windows.Forms.NumericUpDown numOverlap;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.CheckBox chbCentre;
     }
 }
 

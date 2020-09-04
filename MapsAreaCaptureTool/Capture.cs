@@ -5,8 +5,9 @@
         public double[] Coordinate { get; set; }
         public int Altitude { get; set; }
         public string URL { get; set; }
+        public int Overlap { get; set; }
 
-        public Capture(double[] coordinate, int altitude)
+        public Capture(double[] coordinate, int altitude, int overlap)
         {
             Coordinate = coordinate;
             Altitude = altitude;
