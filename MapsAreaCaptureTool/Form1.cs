@@ -53,7 +53,7 @@ namespace MapsAreaCaptureTool
                     using (StreamWriter writer = new StreamWriter(saveDialog.FileName))
                     {
                         writer.WriteLine("CamAlt=" + camAltitude);
-                        writer.WriteLine("Overlap" + numOverlap.Value);
+                        writer.WriteLine("Overlap=" + numOverlap.Value);
                         writer.WriteLine("AlignCaptures=" + chbAlignCaptures.Checked);
                         writer.WriteLine("Grid=" + grid);
                         writer.Write("Captures=");
@@ -428,9 +428,7 @@ namespace MapsAreaCaptureTool
                     }
                 }
                 for (int i = removeIndex.Count - 1; i >= 0; i--)
-                {
                     capturesList.RemoveAt(removeIndex[i]);
-                }
 
                 captureOverlay.Clear();
                 rtbResult.Clear();

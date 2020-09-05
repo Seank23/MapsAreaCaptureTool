@@ -1,5 +1,7 @@
 # MapsAreaCaptureTool
 
+![MapsAreaCaptureTool](https://github.com/Seank23/MapsAreaCaptureTool/blob/master/Images/CaptureTool1.PNG)
+
 A simple tool to help plan out large area captures in Google Maps. Select the area you want to capture and the tool will determine what individual captures should be made at a desired quality level.
 
 ## How To Use
