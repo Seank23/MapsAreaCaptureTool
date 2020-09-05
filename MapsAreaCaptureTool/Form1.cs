@@ -21,6 +21,7 @@ namespace MapsAreaCaptureTool
         private GMapOverlay selectOverlay = new GMapOverlay();
         private GMapOverlay captureOverlay = new GMapOverlay();
         private PointLatLng selStartCoord;
+        private string grid = "";
 
         public MapsAreaCaptureTool()
         {
@@ -52,13 +53,13 @@ namespace MapsAreaCaptureTool
                     using (StreamWriter writer = new StreamWriter(saveDialog.FileName))
                     {
                         writer.WriteLine("CamAlt=" + camAltitude);
+                        writer.WriteLine("Overlap" + numOverlap.Value);
                         writer.WriteLine("AlignCaptures=" + chbAlignCaptures.Checked);
+                        writer.WriteLine("Grid=" + grid);
                         writer.Write("Captures=");
 
                         foreach (Capture capture in capturesList)
-                        {
                             writer.Write(capture.Coordinate[0] + "," + capture.Coordinate[1] + "," + capture.Altitude + "," + capture.Overlap + ";");
-                        }
                     }
                 }
             }
@@ -89,8 +90,14 @@ namespace MapsAreaCaptureTool
                                 case "CamAlt":
                                     camAltitude = int.Parse(data[1]);
                                     break;
+                                case "Overlap":
+                                    numOverlap.Value = int.Parse(data[1]);
+                                    break;
                                 case "AlignCaptures":
                                     chbAlignCaptures.Checked = bool.Parse(data[1]);
+                                    break;
+                                case "Grid":
+                                    grid = data[1];
                                     break;
                                 case "Captures":
                                     string[] captures = data[1].Split(';');
@@ -136,6 +143,11 @@ namespace MapsAreaCaptureTool
                     txtCamAlt.Text = camAltitude.ToString();
                     chbCustomQuality_CheckedChanged(null, null);
                     break;
+            }
+            if (grid != "")
+            {
+                gMapControl.Position = new PointLatLng(double.Parse(grid.Split(',')[0]), double.Parse(grid.Split(',')[1]));
+                gMapControl.Zoom = 14;
             }
 
             rtbResult.Text = "File opened successfully!\n\n";
@@ -195,11 +207,11 @@ namespace MapsAreaCaptureTool
             return Math.Log(40000000 / (camAlt / 2), 2);
         }
 
-        private double[] GetCaptureDimensions(int camAlt)
+        private double[] GetCaptureDimensions(int camAlt, int percentOverlap)
         {
             double length = (2 * Math.PI * 6378137) / (256 * Math.Pow(2, GetZoomLevel(camAlt))) * 1000;
-            double overlapX = length * (Convert.ToDouble(numOverlap.Value) / 100);
-            double overlapY = length / GetAspectRatio() * (Convert.ToDouble(numOverlap.Value) / 100);
+            double overlapX = length * ((double)percentOverlap / 100);
+            double overlapY = length / GetAspectRatio() * ((double)percentOverlap / 100);
             return new double[] { Math.Round(length - overlapX, 2), Math.Round(length / GetAspectRatio() - overlapY, 2) };
         }
 
@@ -258,17 +270,18 @@ namespace MapsAreaCaptureTool
         private List<Capture> GetCaptures()
         {
             List<Capture> myCaptures = new List<Capture>();
-            double[] captureSize = GetCaptureDimensions(camAltitude);
+            double[] captureSize = GetCaptureDimensions(camAltitude, Convert.ToInt32(numOverlap.Value));
             double[] selDimensions = GetDimensionsFromCoords(txtSelCoordUpper.Text, txtSelCoordLower.Text);
 
             int numHorizontal = (int)Math.Ceiling(selDimensions[0] / captureSize[0]);
             int numVertical = (int)Math.Ceiling(selDimensions[1] / captureSize[1]);
-            double startLat = double.Parse(txtSelCoordUpper.Text.Split(',')[0]);
-            double startLng = double.Parse(txtSelCoordUpper.Text.Split(',')[1]);
+
+            double startLat = Math.Max(double.Parse(txtSelCoordUpper.Text.Split(',')[0]), double.Parse(txtSelCoordLower.Text.Split(',')[0]));
+            double startLng = Math.Min(double.Parse(txtSelCoordUpper.Text.Split(',')[1]), double.Parse(txtSelCoordLower.Text.Split(',')[1]));
             
             if(chbCentre.Checked)
             {
-                double[] offset = CalculateOffset(numHorizontal - (selDimensions[0] / captureSize[0]), numVertical - (selDimensions[1] / captureSize[1]), captureSize, double.Parse(txtSelCoordUpper.Text.Split(',')[0]));
+                double[] offset = CalculateOffset(numHorizontal - (selDimensions[0] / captureSize[0]), numVertical - (selDimensions[1] / captureSize[1]), captureSize, startLat);
                 startLat -= offset[1];
                 startLng += offset[0];
             }
@@ -280,7 +293,10 @@ namespace MapsAreaCaptureTool
                 startLng = alignedCoords[1];
             }
 
-            double curLat = startLat;
+            if (capturesList.Count == 0)
+                grid = startLat + "," + startLng;
+
+    double curLat = startLat;
             double curLng = startLng;
 
             for (int i = 0; i < numVertical; i++)
@@ -310,7 +326,7 @@ namespace MapsAreaCaptureTool
                 captureMarker.ToolTipText = capture.URL + "\nDouble-click to copy to clipboard";
                 captureOverlay.Markers.Add(captureMarker);
 
-                double[] captureSize = GetCaptureDimensions(capture.Altitude);
+                double[] captureSize = GetCaptureDimensions(capture.Altitude, capture.Overlap);
                 double topLat = capture.Coordinate[0] + DistanceToLat(captureSize[1] / 2);
                 double topLng = capture.Coordinate[1] - DistanceToLng(topLat, captureSize[0] / 2);
                 double bottomLat = capture.Coordinate[0] - DistanceToLat(captureSize[1] / 2);
@@ -324,6 +340,7 @@ namespace MapsAreaCaptureTool
 
                 rtbResult.Text += capture.URL + "\n";
             }
+            rtbResult.Text += "\n";
         }
 
         private void btnCalculate_Click(object sender, EventArgs e)
@@ -395,6 +412,34 @@ namespace MapsAreaCaptureTool
         {
             Thread.Sleep(1000);
             captureOverlay.Markers[index].ToolTipText = url;
+        }
+
+        private void btnRemove_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                List<int> removeIndex = new List<int>();
+                for (int i = 0; i < capturesList.Count; i++)
+                {
+                    if (capturesList[i].Coordinate[0] <= double.Parse(txtSelCoordUpper.Text.Split(',')[0]) && capturesList[i].Coordinate[0] >= double.Parse(txtSelCoordLower.Text.Split(',')[0])
+                        && capturesList[i].Coordinate[1] >= double.Parse(txtSelCoordUpper.Text.Split(',')[1]) && capturesList[i].Coordinate[1] <= double.Parse(txtSelCoordLower.Text.Split(',')[1]))
+                    {
+                        removeIndex.Add(i);
+                    }
+                }
+                for (int i = removeIndex.Count - 1; i >= 0; i--)
+                {
+                    capturesList.RemoveAt(removeIndex[i]);
+                }
+
+                captureOverlay.Clear();
+                rtbResult.Clear();
+                DisplayCaptures(capturesList);
+            }
+            catch(Exception)
+            {
+                MessageBox.Show("Error: Captures could not be removed");
+            }
         }
     }
 }
