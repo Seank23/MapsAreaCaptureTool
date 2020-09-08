@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnRemove = new System.Windows.Forms.Button();
+            this.chbCentre = new System.Windows.Forms.CheckBox();
             this.label6 = new System.Windows.Forms.Label();
             this.numOverlap = new System.Windows.Forms.NumericUpDown();
             this.label5 = new System.Windows.Forms.Label();
@@ -52,8 +54,7 @@
             this.captureToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gMapControl = new GMap.NET.WindowsForms.GMapControl();
-            this.chbCentre = new System.Windows.Forms.CheckBox();
-            this.btnRemove = new System.Windows.Forms.Button();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numOverlap)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.tbQuality)).BeginInit();
@@ -88,6 +89,28 @@
             this.panel1.Size = new System.Drawing.Size(326, 755);
             this.panel1.TabIndex = 0;
             // 
+            // btnRemove
+            // 
+            this.btnRemove.Location = new System.Drawing.Point(166, 267);
+            this.btnRemove.Name = "btnRemove";
+            this.btnRemove.Size = new System.Drawing.Size(132, 34);
+            this.btnRemove.TabIndex = 18;
+            this.btnRemove.Text = "Remove";
+            this.btnRemove.UseVisualStyleBackColor = true;
+            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
+            // 
+            // chbCentre
+            // 
+            this.chbCentre.AutoSize = true;
+            this.chbCentre.Checked = true;
+            this.chbCentre.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chbCentre.Location = new System.Drawing.Point(148, 222);
+            this.chbCentre.Name = "chbCentre";
+            this.chbCentre.Size = new System.Drawing.Size(150, 21);
+            this.chbCentre.TabIndex = 17;
+            this.chbCentre.Text = "Centre to Selection";
+            this.chbCentre.UseVisualStyleBackColor = true;
+            // 
             // label6
             // 
             this.label6.AutoSize = true;
@@ -100,6 +123,11 @@
             // numOverlap
             // 
             this.numOverlap.Location = new System.Drawing.Point(96, 181);
+            this.numOverlap.Maximum = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
             this.numOverlap.Name = "numOverlap";
             this.numOverlap.Size = new System.Drawing.Size(107, 22);
             this.numOverlap.TabIndex = 15;
@@ -264,7 +292,8 @@
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveAsToolStripMenuItem,
-            this.openToolStripMenuItem});
+            this.openToolStripMenuItem,
+            this.saveToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
             this.fileToolStripMenuItem.Text = "File";
@@ -272,14 +301,14 @@
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(152, 26);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.saveAsToolStripMenuItem.Text = "Save As...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(152, 26);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.openToolStripMenuItem.Text = "Open...";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
@@ -328,27 +357,13 @@
             this.gMapControl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gMapControl_MouseDown);
             this.gMapControl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gMapControl_MouseUp);
             // 
-            // chbCentre
+            // saveToolStripMenuItem
             // 
-            this.chbCentre.AutoSize = true;
-            this.chbCentre.Checked = true;
-            this.chbCentre.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chbCentre.Location = new System.Drawing.Point(148, 222);
-            this.chbCentre.Name = "chbCentre";
-            this.chbCentre.Size = new System.Drawing.Size(150, 21);
-            this.chbCentre.TabIndex = 17;
-            this.chbCentre.Text = "Centre to Selection";
-            this.chbCentre.UseVisualStyleBackColor = true;
-            // 
-            // btnRemove
-            // 
-            this.btnRemove.Location = new System.Drawing.Point(166, 267);
-            this.btnRemove.Name = "btnRemove";
-            this.btnRemove.Size = new System.Drawing.Size(132, 34);
-            this.btnRemove.TabIndex = 18;
-            this.btnRemove.Text = "Remove";
-            this.btnRemove.UseVisualStyleBackColor = true;
-            this.btnRemove.Click += new System.EventHandler(this.btnRemove_Click);
+            this.saveToolStripMenuItem.Enabled = false;
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // MapsAreaCaptureTool
             // 
@@ -401,6 +416,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.CheckBox chbCentre;
         private System.Windows.Forms.Button btnRemove;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
     }
 }
 

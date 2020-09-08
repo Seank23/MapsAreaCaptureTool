@@ -21,6 +21,7 @@ namespace MapsAreaCaptureTool
         private GMapOverlay selectOverlay = new GMapOverlay();
         private GMapOverlay captureOverlay = new GMapOverlay();
         private PointLatLng selStartCoord;
+        private string filename = "";
         private string grid = "";
 
         public MapsAreaCaptureTool()
@@ -41,6 +42,21 @@ namespace MapsAreaCaptureTool
             gMapControl.Overlays.Add(captureOverlay);
         }
 
+        private void SaveFile(string filename)
+        {
+            using (StreamWriter writer = new StreamWriter(filename))
+            {
+                writer.WriteLine("CamAlt=" + camAltitude);
+                writer.WriteLine("Overlap=" + numOverlap.Value);
+                writer.WriteLine("AlignCaptures=" + chbAlignCaptures.Checked);
+                writer.WriteLine("Grid=" + grid);
+                writer.Write("Captures=");
+
+                foreach (Capture capture in capturesList)
+                    writer.Write(capture.Coordinate[0] + "," + capture.Coordinate[1] + "," + capture.Altitude + "," + capture.Overlap + "," + capture.Completed + ";");
+            }
+        }
+
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog saveDialog = new SaveFileDialog();
@@ -50,19 +66,16 @@ namespace MapsAreaCaptureTool
             {
                 if (saveDialog.FileName != "")
                 {
-                    using (StreamWriter writer = new StreamWriter(saveDialog.FileName))
-                    {
-                        writer.WriteLine("CamAlt=" + camAltitude);
-                        writer.WriteLine("Overlap=" + numOverlap.Value);
-                        writer.WriteLine("AlignCaptures=" + chbAlignCaptures.Checked);
-                        writer.WriteLine("Grid=" + grid);
-                        writer.Write("Captures=");
-
-                        foreach (Capture capture in capturesList)
-                            writer.Write(capture.Coordinate[0] + "," + capture.Coordinate[1] + "," + capture.Altitude + "," + capture.Overlap + "," + capture.Completed + ";");
-                    }
+                    filename = saveDialog.FileName;
+                    saveToolStripMenuItem.Enabled = true;
+                    SaveFile(saveDialog.FileName);
                 }
             }
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFile(filename);
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -74,6 +87,8 @@ namespace MapsAreaCaptureTool
             {
                 if (openDialog.FileName != "")
                 {
+                    filename = openDialog.FileName;
+                    saveToolStripMenuItem.Enabled = true;
                     using (StreamReader reader = new StreamReader(openDialog.FileName))
                     {
                         while (!reader.EndOfStream)
@@ -100,6 +115,7 @@ namespace MapsAreaCaptureTool
                                     grid = data[1];
                                     break;
                                 case "Captures":
+                                    ClearCaptures();
                                     string[] captures = data[1].Split(';');
                                     foreach (string capture in captures)
                                     {
@@ -360,6 +376,11 @@ namespace MapsAreaCaptureTool
         {
             try
             {
+                if(camAltitude < 50)
+                {
+                    MessageBox.Show("Camera altitude too low");
+                    return;
+                }
                 string startCoord = txtSelCoordUpper.Text;
                 string endCoord = txtSelCoordLower.Text;
                 if (startCoord.Split(',').Length > 2 || endCoord.Split(',').Length > 2)
@@ -405,6 +426,11 @@ namespace MapsAreaCaptureTool
         }
 
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearCaptures();
+        }
+
+        private void ClearCaptures()
         {
             capturesList.Clear();
             captureOverlay.Clear();
