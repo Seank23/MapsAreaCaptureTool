@@ -59,7 +59,7 @@ namespace MapsAreaCaptureTool
                         writer.Write("Captures=");
 
                         foreach (Capture capture in capturesList)
-                            writer.Write(capture.Coordinate[0] + "," + capture.Coordinate[1] + "," + capture.Altitude + "," + capture.Overlap + ";");
+                            writer.Write(capture.Coordinate[0] + "," + capture.Coordinate[1] + "," + capture.Altitude + "," + capture.Overlap + "," + capture.Completed + ";");
                     }
                 }
             }
@@ -106,7 +106,11 @@ namespace MapsAreaCaptureTool
                                         if (capture != "")
                                         {
                                             string[] captureData = capture.Split(',');
-                                            capturesList.Add(new Capture(new double[] { double.Parse(captureData[0]), double.Parse(captureData[1]) }, int.Parse(captureData[2]), int.Parse(captureData[3])));
+                                            if(captureData.Length > 4)
+                                                capturesList.Add(new Capture(new double[] { double.Parse(captureData[0]), double.Parse(captureData[1]) }, int.Parse(captureData[2]), int.Parse(captureData[3]),
+                                                    bool.Parse(captureData[4])));
+                                            else
+                                                capturesList.Add(new Capture(new double[] { double.Parse(captureData[0]), double.Parse(captureData[1]) }, int.Parse(captureData[2]), int.Parse(captureData[3]), false));
                                         }
                                     }
                                     break;
@@ -267,17 +271,17 @@ namespace MapsAreaCaptureTool
             return new double[] { lat + alignedLat, lng - alignedLng };
         }
 
-        private List<Capture> GetCaptures()
+        private List<Capture> GetCaptures(string startCoord, string endCoord)
         {
             List<Capture> myCaptures = new List<Capture>();
             double[] captureSize = GetCaptureDimensions(camAltitude, Convert.ToInt32(numOverlap.Value));
-            double[] selDimensions = GetDimensionsFromCoords(txtSelCoordUpper.Text, txtSelCoordLower.Text);
+            double[] selDimensions = GetDimensionsFromCoords(startCoord, endCoord);
 
             int numHorizontal = (int)Math.Ceiling(selDimensions[0] / captureSize[0]);
             int numVertical = (int)Math.Ceiling(selDimensions[1] / captureSize[1]);
 
-            double startLat = Math.Max(double.Parse(txtSelCoordUpper.Text.Split(',')[0]), double.Parse(txtSelCoordLower.Text.Split(',')[0]));
-            double startLng = Math.Min(double.Parse(txtSelCoordUpper.Text.Split(',')[1]), double.Parse(txtSelCoordLower.Text.Split(',')[1]));
+            double startLat = Math.Max(double.Parse(startCoord.Split(',')[0]), double.Parse(endCoord.Split(',')[0]));
+            double startLng = Math.Min(double.Parse(startCoord.Split(',')[1]), double.Parse(endCoord.Split(',')[1]));
             
             if(chbCentre.Checked)
             {
@@ -288,15 +292,19 @@ namespace MapsAreaCaptureTool
 
             if (chbAlignCaptures.Checked && capturesList.Count > 0)
             {
-                double[] alignedCoords = AlignCoords(startLat, startLng, captureSize);
+                double[] alignedCoords;
+                if (grid.Split(',').Length > 2)
+                    alignedCoords = AlignCoords(startLat, startLng, GetCaptureDimensions(int.Parse(grid.Split(',')[2]), int.Parse(grid.Split(',')[3])));
+                else
+                    alignedCoords = AlignCoords(startLat, startLng, captureSize);
                 startLat = alignedCoords[0];
                 startLng = alignedCoords[1];
             }
 
             if (capturesList.Count == 0)
-                grid = startLat + "," + startLng;
+                grid = startLat + "," + startLng + "," + camAltitude + "," + numOverlap.Value;
 
-    double curLat = startLat;
+            double curLat = startLat;
             double curLng = startLng;
 
             for (int i = 0; i < numVertical; i++)
@@ -307,7 +315,7 @@ namespace MapsAreaCaptureTool
                     double captureLowerLng = curLng + DistanceToLng(captureLowerLat, captureSize[0]);
                     double captureMidLat = (curLat + captureLowerLat) / 2;
                     double captureMidLng = (curLng + captureLowerLng) / 2;
-                    myCaptures.Add(new Capture(new double[] { Math.Round(captureMidLat, 6), Math.Round(captureMidLng, 6) }, camAltitude, Convert.ToInt32(numOverlap.Value)));
+                    myCaptures.Add(new Capture(new double[] { Math.Round(captureMidLat, 6), Math.Round(captureMidLng, 6) }, camAltitude, Convert.ToInt32(numOverlap.Value), false));
                     curLng = captureLowerLng;
                 }
                 curLat -= DistanceToLat(captureSize[1]);
@@ -334,7 +342,12 @@ namespace MapsAreaCaptureTool
 
                 GMapPolygon capturePoly = new GMapPolygon(new List<PointLatLng>() { new PointLatLng(topLat, topLng), new PointLatLng(topLat, bottomLng),
                         new PointLatLng(bottomLat, bottomLng), new PointLatLng(bottomLat, topLng) }, "");
-                capturePoly.Stroke = new Pen(Color.Blue, 2);
+
+                if(capture.Completed)
+                    capturePoly.Stroke = new Pen(Color.Red, 2);
+                else
+                    capturePoly.Stroke = new Pen(Color.Blue, 2);
+
                 capturePoly.Fill = new SolidBrush(Color.Empty);
                 captureOverlay.Polygons.Add(capturePoly);
 
@@ -347,9 +360,18 @@ namespace MapsAreaCaptureTool
         {
             try
             {
-                var returnedCoords = GetCaptures();
-                capturesList.AddRange(returnedCoords);
-                DisplayCaptures(returnedCoords);
+                string startCoord = txtSelCoordUpper.Text;
+                string endCoord = txtSelCoordLower.Text;
+                if (startCoord.Split(',').Length > 2 || endCoord.Split(',').Length > 2)
+                {
+                    string[] startSplit = startCoord.Split(',');
+                    string[] endSplit = endCoord.Split(',');
+                    startCoord = startSplit[0] + "." + startSplit[1] + "," + startSplit[2] + "." + startSplit[3];
+                    endCoord = endSplit[0] + "." + endSplit[1] + "," + endSplit[2] + "." + endSplit[3];
+                }
+                var returnedCaptures = GetCaptures(startCoord, endCoord);
+                capturesList.AddRange(returnedCaptures);
+                DisplayCaptures(returnedCaptures);
             }
             catch (Exception)
             {
@@ -402,6 +424,8 @@ namespace MapsAreaCaptureTool
                         captureOverlay.Markers[i].ToolTipText = "Copied!";
                         Clipboard.SetText(capturesList[i].URL);
                         Task.Factory.StartNew(() => ResetToolTip(url, i));
+                        capturesList[i].Completed = true;
+                        captureOverlay.Polygons[i].Stroke = new Pen(Color.Red, 2);
                         return;
                     }
                 }
